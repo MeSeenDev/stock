@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@drawable/shape_corners">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="16dp" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_add_to_watchlist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/background"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_add_to_favorites"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toEndOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/guideline_top"
+        tools:text="Add to Watchlist" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_add_to_favorites"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorAccent"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toEndOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/btn_add_to_watchlist"
+        tools:text="Add to Favorites" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

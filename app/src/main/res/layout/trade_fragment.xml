@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/trade_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/background_accent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="16dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="16dp" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_trade"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_stock_symbol"
+                style="@style/Theme.Stock.Trade.Symbol"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toStartOf="@id/tv_diff_stock"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_trade"
+                tools:text="AAPL" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_diff_stock"
+                style="@style/Theme.Stock.Trade.Diff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="0.35 %"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_stock_symbol"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toEndOf="@+id/tv_stock_symbol"
+                app:layout_constraintTop_toTopOf="@id/tv_stock_symbol" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_description"
+                style="@style/Theme.Stock.Trade.Desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="APPLE INC"
+                app:layout_constraintEnd_toStartOf="@id/guideline_end"
+                app:layout_constraintStart_toEndOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/tv_stock_symbol" />
+
+
+            <com.github.mikephil.charting.charts.CandleStickChart
+                android:id="@+id/candleStickChart"
+                android:layout_width="0dp"
+                android:layout_height="360dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_description" />
+
+            <HorizontalScrollView
+                android:id="@+id/chip_horizontal_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:clipToPadding="false"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/candleStickChart">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <!-- 1, 5, 15, 30, 60, D, W, M  -->
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_day"
+                    android:text="@string/day"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_month"
+                    android:text="@string/month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_year"
+                    android:text="@string/year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+            </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                style="@style/Theme.Stock.Trade.Button"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="Bue for $120.25"
+                app:layout_constraintTop_toBottomOf="@id/chip_horizontal_view"
+                app:layout_constraintStart_toEndOf="@id/guideline_start"
+                app:layout_constraintEnd_toStartOf="@id/guideline_end"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

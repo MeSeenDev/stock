@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Stock</string>
+    <string name="delete">Delete</string>
+    <string name="favorites">Favorites</string>
+    <string name="watrh_list_transition_name">watch_list_transition_name</string>
+    <string name="favorite_list_transition_name">favorite_list_transition_name</string>
+    <string name="trade_fragment_transition_name">trade_fragment_transition_name</string>
+    <string name="search_list_transition_name">search_list_transition_name</string>
+    <string name="close_search">Close search</string>
+    <string name="year">Year</string>
+    <string name="month">Month</string>
+    <string name="day">Day</string>
+    <string name="stock">Stock</string>
+    <string name="add_stock">Add Stock</string>
+</resources>

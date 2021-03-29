@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/searchFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_accent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="112dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:toolbarId="@+id/toolbar">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:clipToPadding="false"
+                android:layout_gravity="bottom">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:singleLine="true">
+
+
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                app:layout_collapseMode="pin">
+
+                <ImageView
+                    android:id="@+id/toolbar_nav_home"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:elevation="8dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/close_search"
+                    android:src="@drawable/ic_round_expand_more_24" />
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/search_view"
+                    style="@style/Widget.AppCompat.SearchView"
+                    android:elevation="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    app:searchIcon="@drawable/ic_round_search_24"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/search_swiperefresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/search_item" />
+
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

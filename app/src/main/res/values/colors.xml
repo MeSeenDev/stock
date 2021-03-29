@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">#487FD9</color>
+    <color name="colorPrimary">#16171C</color>
+
+    <color name="purple_700">#16171C</color>
+
+
+    <color name="teal_200">#6090DF</color>
+    <color name="teal_700">#296CDA</color>
+
+
+    <color name="green_color">#78CBBB</color>
+    <color name="red_color">#FF3165</color>
+
+    <color name="background_accent">#43464D</color>
+
+
+    <color name="black">#FF000000</color>
+
+    <color name="background">#010101</color>
+    <color name="background_item_accent">#1E1F26</color>
+
+    <color name="white">#FFFFFFFF</color>
+</resources>

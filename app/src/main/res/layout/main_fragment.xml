@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:transitionGroup="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.Stock.AppBarOverlay">
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_collapseMode="pin"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/Theme.Stock.PopupOverlay">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/lato_bold"
+                android:gravity="center"
+                android:text="@string/stock"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="2dp"
+            app:tabInlineLabel="true"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
+            app:tabTextAppearance="@style/Theme.Stock.Item.TabText">
+
+
+        </com.google.android.material.tabs.TabLayout>
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_stocks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_anchorGravity="center"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/main_fab"
+        style="@style/Theme.Stock.FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="@string/add_stock"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_baseline_add_24" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

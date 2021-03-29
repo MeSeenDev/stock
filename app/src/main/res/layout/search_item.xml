@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/search_fragment_item_parent"
+    android:layout_height="96dp"
+    android:background="@color/red_color">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mtrl_card_checked_layer_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardBackgroundColor="@color/background"
+        app:cardCornerRadius="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="16dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="16dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="16dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_end="16dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_description"
+                style="@style/Theme.Stock.Item.MaterialTextView.Search"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/tv_type"
+                app:layout_constraintEnd_toStartOf="@+id/tv_display_symbol"
+                app:layout_constraintStart_toEndOf="@id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@id/guideline_top"
+                tools:text="APPLE INC" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_display_symbol"
+                style="@style/Theme.Stock.Item.MaterialTextView.Search"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
+                app:layout_constraintEnd_toStartOf="@id/guideline_end"
+                app:layout_constraintStart_toEndOf="@id/tv_description"
+                app:layout_constraintTop_toBottomOf="@id/guideline_top"
+                tools:text="AAPL" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_type"
+                style="@style/Theme.Stock.Item.MaterialTextView.Search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
+                app:layout_constraintEnd_toStartOf="@+id/tv_display_symbol"
+                app:layout_constraintStart_toEndOf="@id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@id/tv_description"
+                tools:text="Common Stock" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+</FrameLayout>
