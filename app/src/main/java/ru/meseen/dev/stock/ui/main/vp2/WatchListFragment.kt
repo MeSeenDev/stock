@@ -1,5 +1,6 @@
 package ru.meseen.dev.stock.ui.main.vp2
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.meseen.dev.stock.R
@@ -54,8 +56,6 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
         submitList()
         observeRepoStatus()
         swipeRefreshListener()
-        itemTouch.attachToRecyclerView(vb.rvStockItem)
-
     }
 
     private fun swipeRefreshListener() {
@@ -79,25 +79,6 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
             }
         }
     }
-
-    private val itemTouch = ItemTouchHelper(object :
-        ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.layoutPosition
-            adapter.currentList[position]._id?.let { _id ->
-                viewModel.deleteStock(_id)
-            }
-        }
-
-    })
 
     override fun stockClick(stockMainEntity: StockMainEntity, view: View) {
         val symbol = Bundle()

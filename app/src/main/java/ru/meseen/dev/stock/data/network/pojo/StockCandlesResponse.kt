@@ -10,23 +10,23 @@ import kotlinx.serialization.Serializable
 data class StockCandlesResponse(
 
     @SerialName("c")
-    val close_prices: List<Double?>? = null,
+    val close_prices: List<Float?>? = null,
 
     @SerialName("s")
     val status_response: String? = null,
 
     @SerialName("t")
-    val timestamp: List<Int?>? = null,
+    val timestamp: List<Long?>? = null,
 
     @SerialName("v")
-    val volume_datas: List<Int?>? = null,
+    val volume_datas: List<Long?>? = null,
 
     @SerialName("h")
-    val high_prices: List<Double?>? = null,
+    val high_prices: List<Float?>? = null,
 
     @SerialName("l")
-    val low_prices: List<Double?>? = null,
+    val low_prices: List<Float?>? = null,
 
     @SerialName("o")
-    val open_prices: List<Double?>? = null
+    val open_prices: List<Float?>? = null
 )

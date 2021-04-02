@@ -14,6 +14,8 @@
         <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/mBottomSheetDialogTheme</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:itemBackground">@color/colorPrimary</item>
 
     </style>
 
@@ -81,6 +83,16 @@
 
     <style name="Theme.Stock.Trade.Button" parent="Theme.Stock.Buttons">
         <item name="android:minHeight">64dp</item>
+    </style>
+
+    <style name="Theme.Stock.Trade.Chips" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/trade_chip_color</item>
+        <item name="android:checkable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="rippleColor">@color/colorAccent</item>
+        <item name="colorOnSurface">@color/colorAccent</item>
+        <item name="android:textColor">@color/trade_chip_font_color</item>
 
     </style>
 

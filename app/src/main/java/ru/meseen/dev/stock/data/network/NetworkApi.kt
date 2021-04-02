@@ -1,6 +1,7 @@
 package ru.meseen.dev.stock.data.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.Authenticator
 import okhttp3.MediaType.Companion.toMediaType
@@ -15,7 +16,8 @@ import java.util.concurrent.TimeUnit
 object NetworkApi {
 
     private const val WSS_URL = "wss://ws.finnhub.io?token=c19p7f748v6obcihhqcg"
-    private const val TOKEN = "sandbox_c19p7f748v6obcihhqd0"
+    private const val TOKEN_SANDBOX = "sandbox_c19p7f748v6obcihhqd0"
+    private const val TOKEN = "c19p7f748v6obcihhqcg"
     private const val BASE_URL = "https://finnhub.io/api/v1/"
     private const val API_KEY_HEADER = "X-Finnhub-Token"
 
@@ -29,6 +31,7 @@ object NetworkApi {
 
     private val contentType = "application/json".toMediaType()
 
+    @ExperimentalSerializationApi
     private val converter = json.asConverterFactory(contentType)
 
     private val authenticator =
@@ -55,15 +58,13 @@ object NetworkApi {
         .addConverterFactory(converter)
         .build()
 
-    val finnhubService = retrofit.create(FinnhubService::class.java)
+    val finnhubService: FinnhubService = retrofit.create(FinnhubService::class.java)
 
     val tradeWebSocketListener = TradeWebSokets(json)
     object TradeWebSocket : WebSocket by okHttpClient.newWebSocket(
         Request.Builder()
         .url(WSS_URL)
-        .build(),tradeWebSocketListener){
-
-    }
+        .build(),tradeWebSocketListener)
 
 
 }

@@ -12,4 +12,5 @@
     <string name="day">Day</string>
     <string name="stock">Stock</string>
     <string name="add_stock">Add Stock</string>
+    <string name="btn_trade_buy">Buy</string>
 </resources>

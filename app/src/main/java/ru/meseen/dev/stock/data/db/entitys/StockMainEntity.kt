@@ -44,8 +44,7 @@ data class StockMainEntity(
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readByte() != 0.toByte(),
         parcel.readLong()
-    ) {
-    }
+    )
 
     constructor(
         quote: QuoteResponse,

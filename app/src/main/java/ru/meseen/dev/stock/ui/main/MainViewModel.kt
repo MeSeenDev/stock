@@ -11,8 +11,5 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: StockMainRepo,
     private val handle: SavedStateHandle
-) : ViewModel() {
-
-
-}
+) : ViewModel()
 

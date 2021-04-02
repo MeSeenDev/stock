@@ -2,7 +2,10 @@ package ru.meseen.dev.stock.data
 
 import android.util.Log
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import ru.meseen.dev.stock.data.db.daos.StockDao
 import ru.meseen.dev.stock.data.db.entitys.SearchItem
 import ru.meseen.dev.stock.data.db.entitys.SearchedWordEntity
@@ -143,18 +146,36 @@ class Repository @Inject constructor(
     override fun lastSearchedWords(): Flow<List<SearchedWordEntity>> =
         stockDao.readSearchedWords()
 
-    override fun getCandlesArrays(
+    private val _candles = MutableStateFlow(StockCandles())
+
+    override fun getCandles(): StateFlow<StockCandles> = _candles
+
+
+    override fun requeryCandles(
         symbol: String,
-        resolution: String,
-        from: Long,
-        to: Long
-    ): Flow<StockCandles> = flow {
-        _loadingStatus.value = Result.Loading("Start Searching")
-        val candleResponse = networkApi.getSymbolCandles(symbol, resolution, from, to)
-        emit(StockCandles(candleResponse))
-        _loadingStatus.value = Result.Success("New Stock added")
-    }.flowOn(Dispatchers.IO).catch { cause: Throwable ->
-        cause.message?.let { _loadingStatus.value = Result.Error(it) }
+        timeFrame: TimeFrame,
+        timePeriod: TimePeriod
+    ) {
+        _loadingStatus.value = Result.Loading("Start Loading Candles")
+        repositoryScope.launch {
+            val currentTime: Long = System.currentTimeMillis() / 1000
+            Log.d(TAG, "getCandlesArrays: $currentTime")
+
+            val from = currentTime - timePeriod.timestamp
+            Log.d(TAG, "requeryCandles: symbol: ${symbol}, resolution: ${timeFrame.resolution}, from: $from, currentTime: $currentTime}")
+            val candleResponse = networkApi.getSymbolCandles(symbol, timeFrame.resolution, from, currentTime)
+            Log.d(TAG, "getSymbolCandles: ${candleResponse.open_prices} ")
+            Log.d(TAG, "getSymbolCandles: ${_candles.value.open_prices} ")
+            _loadingStatus.value =
+                Result.Loading("Post loading stat ${candleResponse.status_response}")
+            _candles.value = StockCandles(candleResponse)
+            _loadingStatus.value =
+                Result.Success("New Stock added ${candleResponse.status_response}")
+        }
+    }
+
+    override fun clearCandles() {
+        _candles.value = StockCandles()
     }
 
 
@@ -190,12 +211,22 @@ interface SearchStockRepo : RepoStatus {
 }
 
 interface TradeStockRepo : RepoStatus {
+    fun getCandles(): StateFlow<StockCandles>
 
-    fun getCandlesArrays(
+    fun requeryCandles(
         symbol: String,
-        resolution: String,
-        from: Long,
-        to: Long
-    ): Flow<StockCandles>
+        timeFrame: TimeFrame,
+        timePeriod: TimePeriod
+    )
+    fun clearCandles()
 }
 
+
+enum class TimePeriod(val timestamp: Long) {
+    DAY(86400L), MONTH(2592000), YEAR(31536000)
+}
+
+enum class TimeFrame(val resolution: String) {
+    ONE_M("1"), FIVE_M("5"), FIFTEEN_M("15"), THIRTY_M("30")
+    , HOUR("60"), DAY("D"), WEEK("W"), MONTH("M")
+}

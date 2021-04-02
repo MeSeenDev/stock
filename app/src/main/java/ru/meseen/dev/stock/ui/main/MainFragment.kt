@@ -21,71 +21,9 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         const val TAG = "MainFragment"
     }
 
-    /*
-    private lateinit var ws: WebSocket
-
-    lifecycleScope.launchWhenCreated {
-         launch(Dispatchers.IO + coroutineExceptionHandler) {
-             try {
-                 ApiClient.apiKey["token"] = "sandbox_c19p7f748v6obcihhqd0"
-                 val req =
-                     Request.Builder().url("wss://ws.finnhub.io?token=c19p7f748v6obcihhqcg")
-                         .build()
-                 val listenerWeb = TradeWebSokets()
-                 ws = ApiClient.client.newWebSocket(req, listenerWeb)
-                 val apiClient = DefaultApi()
-
-                 val previos = apiClient.quote("YNDX")
-
-
-                 val jsonObject = JSONObject()
-                 jsonObject.put("type", "subscribe")
-                 jsonObject.put("symbol", "AAPL")
-                 val jsonObject2 = JSONObject()
-                 jsonObject2.put("type", "subscribe")
-                 jsonObject2.put("symbol", "YNDX")
-                 ws.send(jsonObject.toString())
-                 ws.send(jsonObject2.toString())
-
-                 launch(Dispatchers.IO) {
-                     listenerWeb.flows.collectLatest { text ->
-                         if (text.isSuccess) {
-                             text.getOrNull()?.let {
-                                 if (it.type != null && it.type == "trade") {
-                                     val previosPrice = previos.pc
-                                     val curPrice = it.data?.get(0)?.price
-                                     withContext(Dispatchers.Main) {
-                                         val text = "${it.data?.get(0)?.symbol.toString()} " +
-                                                 "- $${it.data?.get(0)?.price} " +
-                                                 "- ${it.data?.get(0)?.volume.toString()}\n" +
-                                                 "-= ${
-                                                     (previosPrice?.let { prev ->
-                                                         curPrice?.let { cur ->
-                                                             "%.${3}f".format(
-                                                                 (cur - prev)
-                                                             )
-                                                         }
-                                                     })
-                                                 } =-"
-                                       //  binding.message.text = text
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 }
-             } catch (thr: Throwable) {
-                 Log.wtf("ERROR", " $coroutineContext : ${thr.localizedMessage}")
-             }
-
-         }
-     }*/
-
-
     private val vb by viewBinding(MainFragmentBinding::bind, R.id.main)
 
     private val viewModel: MainViewModel by viewModels()
-
 
 
     //{"type":"subscribe","symbol":"AAPL"}
