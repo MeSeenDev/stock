@@ -79,8 +79,6 @@ dependencies {
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
     implementation "androidx.fragment:fragment-ktx:$rootProject.fragment_version"
 
-    //noinspection GradleDependency
-    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
     //Dagger-hilt
     implementation "com.google.dagger:hilt-android:$rootProject.hilt"

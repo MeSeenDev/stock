@@ -54,7 +54,7 @@ class SearchItemVH(private val view: View, private val listener: OnSearchItemCli
     }
 
     private fun backgroundColorize() {
-        if (absoluteAdapterPosition >= 0 && absoluteAdapterPosition % 2 == 0) {
+        if (adapterPosition >= 0 && adapterPosition % 2 == 0) {
             vb.mtrlCardCheckedLayerId.setBackgroundResource(R.color.background)
         } else {
             vb.mtrlCardCheckedLayerId.setBackgroundResource(R.color.background_item_accent)

@@ -39,7 +39,8 @@ class StockVH(
     }
 
     private fun setBackgroundColor() {
-        absoluteAdapterPosition.let { id ->
+
+        adapterPosition.let { id ->
             vb.stockItemRoot.setBackgroundColor(
                 vb.root.context.getCardBackGroundColor((id % 2) == 0))
         }
