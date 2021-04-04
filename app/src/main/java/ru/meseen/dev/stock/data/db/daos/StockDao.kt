@@ -23,7 +23,7 @@ interface StockDao {
     @Query("SELECT * FROM TABLE_STOCK_MAIN")
     fun readAllStock(): List<StockMainEntity>
 
-    @Query("SELECT * FROM TABLE_SEARCHED_WORDS")
+    @Query("SELECT * FROM TABLE_SEARCHED_WORDS ORDER BY _id ASC")
     fun readSearchedWords(): Flow<List<SearchedWordEntity>>
 
     @Query("SELECT * FROM TABLE_SEARCHED_WORDS")

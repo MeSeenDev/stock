@@ -1,5 +1,6 @@
 package ru.meseen.dev.stock.ui.search
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -9,6 +10,7 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.collection.arrayMapOf
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.view.size
@@ -18,12 +20,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.Slide
+import androidx.transition.TransitionManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialFade
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.meseen.dev.stock.R
@@ -57,13 +61,15 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
         }
         setTransition(view)
         vb.searchView.setOnQueryTextListener(queryTextListener)
+        vb.searchView.setIconifiedByDefault(false)
+
         vb.rvSearchList.layoutManager = LinearLayoutManager(view.context)
         vb.rvSearchList.adapter = adapter
         vb.chipGroupSearch.setOnCheckedChangeListener(chipListener)
 
         setupRefreshStateListener()
         submitSearchList()
-        setupSearchedWordsChips(view)
+        setupSearchedWordsChips()
         setupSwipeRefreshListener()
     }
 
@@ -85,19 +91,42 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
         }
     }
 
-    private fun setupSearchedWordsChips(view: View) {
+    private fun setupSearchedWordsChips() {
         lifecycleScope.launchWhenCreated {
             viewModel.lastSearchedWords().collectLatest { words ->
-                words.forEach { word ->
-                    if (chipWords.contains(word.word)) return@forEach
-                    val chip = Chip(view.context)
-                    chipWords[word.word] = word.word
-                    chip.text = word.word
-                    chip.setOnClickListener(onChipListener)
-                    vb.chipGroupSearch.addView(chip)
+                words.forEach { searchWord ->
+                    if (chipWords.contains(searchWord.word)) return@forEach
+                    chipWords[searchWord.word] = searchWord.word
+                    val transform = MaterialFade().apply {
+                        duration = resources.getInteger(R.integer.def_fade_duration).toLong()
+                    }
+                    vb.chipGroupSearch.addView(
+                        createChip(requireContext(), word = searchWord.word),
+                        0
+                    )
+                    TransitionManager.beginDelayedTransition(vb.chipGroupSearch, transform)
                 }
             }
         }
+    }
+
+    private fun createChip(context: Context, word: String): View = Chip(context).apply {
+        chipStartPadding = resources.getDimension(R.dimen.search_chip_inner_padding)
+        chipEndPadding = resources.getDimension(R.dimen.search_chip_inner_padding)
+        text = word
+        setOnClickListener(onChipListener)
+        chipBackgroundColor = ResourcesCompat.getColorStateList(
+            resources,
+            R.color.search_chip_color,
+            null
+        )
+        setTextColor(
+            ResourcesCompat.getColorStateList(
+                resources,
+                R.color.search_chip_font_color,
+                null
+            )
+        )
     }
 
     private fun submitSearchList() {
@@ -153,7 +182,7 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
         override fun onQueryTextChange(newText: String?): Boolean {
             Log.d(TAG, "onQueryTextChange: $newText")
             newText?.let {
-                if(!chipWords.contains(it)){
+                if (!chipWords.contains(it)) {
                     searchTimer.start()
                 }
             }
@@ -189,7 +218,7 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
     override fun itemClick(item: SearchItem, view: View) {
         val dialog = BottomSheetDialog(view.context)
         val bottomSheet =
-            LayoutInflater.from(view.context).inflate(R.layout.search_bottom_sheet,vb.root,false)
+            LayoutInflater.from(view.context).inflate(R.layout.search_bottom_sheet, vb.root, false)
         bottomSheet.findViewById<MaterialButton>(R.id.btn_add_to_watchlist).apply {
             val temp = "Add '${item.symbol}' to Watchlist"
             text = temp

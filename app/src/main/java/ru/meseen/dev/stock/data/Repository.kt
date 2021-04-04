@@ -25,7 +25,7 @@ class Repository @Inject constructor(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { context, throwable ->
         throwable.message?.let { message ->
-            _loadingStatus.value = Response.Error(message)
+            _loadingStatus.error(message)
         }
         Log.wtf(
             TAG, "WTF: coroutineExceptionHandler ${throwable.message} " +
@@ -39,6 +39,17 @@ class Repository @Inject constructor(
 
     private val _loadingStatus by lazy { MutableStateFlow<Response>(Response.Loading("Loading")) }
 
+    private fun MutableStateFlow<Response>.error(message: String) {
+        value = Response.Error(message)
+    }
+
+    private fun MutableStateFlow<Response>.loading(message: String) {
+        value = Response.Loading(message)
+    }
+
+    private fun MutableStateFlow<Response>.success(message: String) {
+        value = Response.Success(message)
+    }
 
     override fun getLoadingStatus(): StateFlow<Response> = _loadingStatus
 
@@ -58,7 +69,7 @@ class Repository @Inject constructor(
     override fun refreshStock() {
         repositoryScope.launch {
             var count = 0L
-            _loadingStatus.value = Response.Loading("Start refreshing ")
+            _loadingStatus.loading("Start refreshing")
             stockDao.readAllStock().forEach { stock ->
                 val response = networkApi.getQuote(stock.symbol)
                 val newStock =
@@ -72,39 +83,49 @@ class Repository @Inject constructor(
                 stockDao.insert(newStock)
                 count++
             }
-            _loadingStatus.value = Response.Success("Refreshed $count fields updated")
+            _loadingStatus.success("Refreshed $count fields updated")
         }
     }
 
     override fun deleteStock(stockId: Long) {
         repositoryScope.launch {
             val itemDeleted = stockDao.deleteStockById(stockId)
-            _loadingStatus.value = Response.Success("$itemDeleted item successfully deleted")
+            _loadingStatus.success("$itemDeleted item successfully deleted")
         }
     }
 
     override fun clearStockTable() {
         repositoryScope.launch {
             val itemDeleted = stockDao.clearStockMain()
-            _loadingStatus.value = Response.Success("$itemDeleted item successfully deleted")
+            _loadingStatus.success("$itemDeleted item successfully deleted")
         }
     }
 
 
     override fun addNewStock(searchItem: SearchItem, isFavorite: Boolean): LongArray {
-        _loadingStatus.value = Response.Loading("Start Searching")
-        Log.d(TAG, "addNewStock: $searchItem")
+        _loadingStatus.loading("Start Searching")
         var quantity: LongArray = longArrayOf(-1)
         repositoryScope.launch {
-            val quote = searchItem.symbol?.let { networkApi.getQuote(it) }
+            val quote = searchItem.symbol?.let {
+                return@let if (isSymbolExists(it)) {
+                    networkApi.getQuote(it)
+                } else {
+                    _loadingStatus.error("Stock Already Exists")
+                    return@launch
+                }
+            }
             quote?.let {
                 val stockMainEntity = StockMainEntity(it, searchItem, isFavorite)
                 quantity = stockDao.insert(stockMainEntity)
             }
-            _loadingStatus.value = Response.Success("New Stock added")
+            _loadingStatus.success("New Stock added")
         }
         return quantity
     }
+
+    private suspend fun isSymbolExists(symbol: String): Boolean =
+        !stockDao.readAllStock().map { it.symbol }.contains(symbol)
+
 
     private val _listSearchItems by lazy { MutableStateFlow(listOf<SearchItem>()) }
 
@@ -116,7 +137,7 @@ class Repository @Inject constructor(
     }
 
     override fun search(query: String) {
-        _loadingStatus.value = Response.Loading("Start Searching")
+        _loadingStatus.loading("Start Searching")
         repositoryScope.launch {
             val searchResult = networkApi.search(query)
             val searchItems = searchResult.resultSearch
@@ -126,8 +147,8 @@ class Repository @Inject constructor(
                 }
             searchItems?.let { items ->
                 _listSearchItems.value = items
-                _loadingStatus.value = Response.Success("New Stock added")
                 addSearchedWord(query)
+                _loadingStatus.success("New Stock added")
             }
         }
     }
@@ -136,7 +157,7 @@ class Repository @Inject constructor(
         launch {
             val curSearchedWords = stockDao.readAllSearchedWords()
             if (curSearchedWords.size > 19) {
-                stockDao.deleteSearchedWord(curSearchedWords.last())
+                stockDao.deleteSearchedWord(curSearchedWords.first())
             }
             if (curSearchedWords.find { it.word == query } == null) {
                 stockDao.insert(SearchedWordEntity(word = query))
@@ -157,21 +178,21 @@ class Repository @Inject constructor(
         timeFrame: TimeFrame,
         timePeriod: TimePeriod
     ) {
-        _loadingStatus.value = Response.Loading("Start Loading Candles")
+        _loadingStatus.loading("Start Loading Candles")
         try {
             val currentTime: Long = System.currentTimeMillis() / 1000
             val from = currentTime - timePeriod.timestamp
             val candleResponse =
                 networkApi.getSymbolCandles(symbol, timeFrame.resolution, from, currentTime)
-            _loadingStatus.value =
-                Response.Loading("Post loading stat ${candleResponse.status_response}")
-
+            _loadingStatus.loading("Start Loading in  _candles ${candleResponse.status_response}")
             _candles.value = StockCandles(candleResponse)
-
-            _loadingStatus.value =
-                Response.Success("New Stock added ${candleResponse.status_response}")
+            if (candleResponse.status_response == "no_data") {
+                _loadingStatus.error("Have no candles for period")
+            } else {
+                _loadingStatus.success("New Stock is added ${candleResponse.status_response}")
+            }
         } catch (thr: Throwable) {
-            Response.Error("New Stock not added $thr")
+            _loadingStatus.error("New Stock is not added:reason-> $thr")
         }
     }
 
@@ -199,9 +220,9 @@ class Repository @Inject constructor(
             if (result.isSuccess) {
                 _tradeWebSocketResponse.value =
                     result.getOrNull()?.data?.foldToTrade() ?: TradeSocketData()
-                _loadingStatus.value = Response.Success("WebSocket Success")
+                _loadingStatus.success("WebSocket receive Success")
             } else {
-                _loadingStatus.value = Response.Error("webSocket  ${result.exceptionOrNull()}")
+                _loadingStatus.error("Error with webSocket:  ${result.exceptionOrNull()}")
             }
         }
     }
@@ -218,7 +239,7 @@ class Repository @Inject constructor(
 
 
     override fun stopSocket() {
-        tradeWebSocket?.close(1001, "Fuu")
+        tradeWebSocket?.close(1001, "Accepted close")
     }
 
 
@@ -260,6 +281,7 @@ interface TradeStockRepo : RepoStatus {
         timeFrame: TimeFrame,
         timePeriod: TimePeriod
     )
+
     fun clearCandles()
     fun startWebSocket()
     suspend fun sendWebSocket(symbol: String)

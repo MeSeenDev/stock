@@ -39,14 +39,15 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             viewModel.invalidateStockList()
         }
         super.onCreate(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        ViewCompat.setTransitionName(view,getString(R.string.watrh_list_transition_name))
+        ViewCompat.setTransitionName(view, getString(R.string.watrh_list_transition_name))
+
         vb.rvStockItem.adapter = adapter
         vb.rvStockItem.layoutManager = LinearLayoutManager(view.context)
         submitList()
@@ -79,7 +80,8 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
     override fun stockClick(stockMainEntity: StockMainEntity, view: View) {
         val symbol = Bundle()
         symbol.putString(TradeFragment.SYMBOL_TRADE, stockMainEntity.symbol)
-        val extras = FragmentNavigatorExtras(view to getString(R.string.trade_fragment_transition_name))
+        val extras =
+            FragmentNavigatorExtras(view to getString(R.string.trade_fragment_transition_name))
         val directions = MainFragmentDirections.actionMainFragmentToTradeFragment(stockMainEntity)
         findNavController().navigate(directions, extras)
     }
@@ -90,7 +92,7 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
         menu.setOnMenuItemClickListener {
             return@setOnMenuItemClickListener when (it.itemId) {
                 R.id.addFavorites -> {
-                        viewModel.switchStockList(stockMainEntity)
+                    viewModel.switchStockList(stockMainEntity)
                     true
                 }
                 R.id.deleteStock -> {

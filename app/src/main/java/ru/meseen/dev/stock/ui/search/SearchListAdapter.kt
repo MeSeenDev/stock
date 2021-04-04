@@ -19,6 +19,8 @@ class SearchListAdapter(private val listener: OnSearchItemClick) :
             override fun areItemsTheSame(oldItem: SearchItem, newItem: SearchItem): Boolean =
                 oldItem == newItem
 
+            override fun getChangePayload(oldItem: SearchItem, newItem: SearchItem): Any? = Any()
+
             override fun areContentsTheSame(oldItem: SearchItem, newItem: SearchItem): Boolean =
                 oldItem.description == newItem.description && oldItem.symbol == newItem.symbol
 

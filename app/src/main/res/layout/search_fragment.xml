@@ -35,7 +35,8 @@
                     android:layout_height="?attr/actionBarSize"
                     android:clickable="true"
                     android:focusable="true"
-                    app:singleLine="true">
+                    app:singleLine="true"
+                    android:animateLayoutChanges="true">
 
 
                 </com.google.android.material.chip.ChipGroup>

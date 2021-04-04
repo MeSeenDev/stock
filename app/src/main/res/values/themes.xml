@@ -15,7 +15,7 @@
         <item name="bottomSheetDialogTheme">@style/mBottomSheetDialogTheme</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:itemBackground">@color/colorPrimary</item>
+        <item name="android:itemBackground">@color/colorAccent</item>
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Choice</item>
 
     </style>
