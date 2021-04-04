@@ -13,4 +13,7 @@
     <string name="stock">Stock</string>
     <string name="add_stock">Add Stock</string>
     <string name="btn_trade_buy">Buy</string>
+    <string name="connection_observer_restored">Connection restored</string>
+    <string name="connection_observer_lost">Lost internet connection</string>
+    <string name="diff_arrow">diff arrow</string>
 </resources>

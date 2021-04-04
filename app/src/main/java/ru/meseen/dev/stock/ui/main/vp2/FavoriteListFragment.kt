@@ -1,7 +1,6 @@
 package ru.meseen.dev.stock.ui.main.vp2
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
@@ -9,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +15,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.meseen.dev.stock.R
-import ru.meseen.dev.stock.data.Result
+import ru.meseen.dev.stock.data.Response
 import ru.meseen.dev.stock.data.db.entitys.StockMainEntity
 import ru.meseen.dev.stock.databinding.ListStockBinding
 import ru.meseen.dev.stock.ui.details.TradeFragment
@@ -34,8 +32,14 @@ class FavoriteListFragment : Fragment(R.layout.list_stock), OnStockClickItem, On
 
     private val vb by viewBinding(ListStockBinding::bind, R.id.parent)
 
+    companion object{
+        fun getInstance()= FavoriteListFragment()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        viewModel.invalidateStockList()
+        if (savedInstanceState == null){
+            viewModel.invalidateStockList()
+        }
         super.onCreate(savedInstanceState)
     }
 
@@ -60,7 +64,7 @@ class FavoriteListFragment : Fragment(R.layout.list_stock), OnStockClickItem, On
     private fun observeRepoStatus() {
         lifecycleScope.launchWhenCreated {
             viewModel.loadingStatus().asLiveData().observe(viewLifecycleOwner) { result ->
-                vb.swipeRefresh.isRefreshing = result is Result.Loading
+                vb.swipeRefresh.isRefreshing = result is Response.Loading
             }
         }
     }

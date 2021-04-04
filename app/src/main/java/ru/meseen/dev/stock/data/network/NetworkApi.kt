@@ -7,7 +7,6 @@ import okhttp3.Authenticator
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.WebSocket
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import ru.meseen.dev.stock.data.network.service.FinnhubService
@@ -60,11 +59,15 @@ object NetworkApi {
 
     val finnhubService: FinnhubService = retrofit.create(FinnhubService::class.java)
 
-    val tradeWebSocketListener = TradeWebSokets(json)
-    object TradeWebSocket : WebSocket by okHttpClient.newWebSocket(
-        Request.Builder()
-        .url(WSS_URL)
-        .build(),tradeWebSocketListener)
+    val tradeWebSocketListener = TradeWebSockets(json)
+
+    fun tradeWebSocket() =
+        okHttpClient.newWebSocket(
+            Request.Builder()
+                .url(WSS_URL)
+                .build(), tradeWebSocketListener
+        )
+
 
 
 }

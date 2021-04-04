@@ -1,6 +1,5 @@
 package ru.meseen.dev.stock.ui.main.vp2
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
@@ -11,15 +10,12 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.meseen.dev.stock.R
-import ru.meseen.dev.stock.data.Result
+import ru.meseen.dev.stock.data.Response
 import ru.meseen.dev.stock.data.db.entitys.StockMainEntity
 import ru.meseen.dev.stock.databinding.ListStockBinding
 import ru.meseen.dev.stock.ui.details.TradeFragment
@@ -39,13 +35,13 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
 
     companion object {
         private const val TAG = "WatchListFragment"
-        fun getInstance(): WatchListFragment {
-            return WatchListFragment()
-        }
+        fun getInstance() = WatchListFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        viewModel.invalidateStockList()
+        if (savedInstanceState == null){
+            viewModel.invalidateStockList()
+        }
         super.onCreate(savedInstanceState)
     }
 
@@ -75,7 +71,7 @@ class WatchListFragment : Fragment(R.layout.list_stock), OnStockClickItem, OnLon
     private fun observeRepoStatus() {
         lifecycleScope.launchWhenCreated {
             viewModel.loadingStatus().asLiveData().observe(viewLifecycleOwner) { result ->
-                vb.swipeRefresh.isRefreshing = result is Result.Loading
+                vb.swipeRefresh.isRefreshing = result is Response.Loading
             }
         }
     }

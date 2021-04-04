@@ -11,8 +11,10 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meseen.dev.stock.R
+import ru.meseen.dev.stock.data.RepoStatus
 import ru.meseen.dev.stock.databinding.MainFragmentBinding
 import ru.meseen.dev.stock.ui.main.vp2.adapters.ViewPager2Adapter
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.main_fragment) {
@@ -24,6 +26,7 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     private val vb by viewBinding(MainFragmentBinding::bind, R.id.main)
 
     private val viewModel: MainViewModel by viewModels()
+
 
 
     //{"type":"subscribe","symbol":"AAPL"}
@@ -45,6 +48,9 @@ class MainFragment : Fragment(R.layout.main_fragment) {
             }
             findNavController().navigate(R.id.searchFragment)
         }
+
+
+
     }
 
     private fun configTabs() {

@@ -72,11 +72,23 @@
                 style="@style/Theme.Stock.Trade.Symbol"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toStartOf="@id/tv_diff_stock"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@id/iv_arrow"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_trade"
                 tools:text="AAPL" />
+
+            <ImageView
+                android:id="@+id/iv_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:src="@drawable/ic_round_arrow"
+                android:contentDescription="@string/diff_arrow"
+                app:layout_constraintStart_toEndOf="@id/tv_stock_symbol"
+                app:layout_constraintEnd_toStartOf="@id/tv_diff_stock"
+                app:layout_constraintTop_toTopOf="@id/tv_stock_symbol"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_stock_symbol"
+                />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_diff_stock"
@@ -85,7 +97,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_stock_symbol"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintStart_toEndOf="@+id/tv_stock_symbol"
+                app:layout_constraintStart_toEndOf="@+id/iv_arrow"
                 app:layout_constraintTop_toTopOf="@id/tv_stock_symbol"
                 tools:text="0.35 %" />
 
@@ -104,7 +116,7 @@
                 android:id="@+id/candleStickChart"
                 android:layout_width="0dp"
                 android:layout_height="360dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_description" />

@@ -1,16 +1,16 @@
 package ru.meseen.dev.stock.data
 
 import android.util.Log
+import androidx.annotation.StringRes
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
+import okhttp3.WebSocket
+import org.json.JSONObject
+import ru.meseen.dev.stock.R
 import ru.meseen.dev.stock.data.db.daos.StockDao
-import ru.meseen.dev.stock.data.db.entitys.SearchItem
-import ru.meseen.dev.stock.data.db.entitys.SearchedWordEntity
-import ru.meseen.dev.stock.data.db.entitys.StockCandles
-import ru.meseen.dev.stock.data.db.entitys.StockMainEntity
+import ru.meseen.dev.stock.data.db.entitys.*
+import ru.meseen.dev.stock.data.network.NetworkApi
+import ru.meseen.dev.stock.data.network.pojo.DataItem
 import ru.meseen.dev.stock.data.network.service.FinnhubService
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class Repository @Inject constructor(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { context, throwable ->
         throwable.message?.let { message ->
-            _loadingStatus.value = Result.Error(message)
+            _loadingStatus.value = Response.Error(message)
         }
         Log.wtf(
             TAG, "WTF: coroutineExceptionHandler ${throwable.message} " +
@@ -33,13 +33,14 @@ class Repository @Inject constructor(
                     throwable.stackTrace.contentToString()
         )
     }
-    private val repositoryScope =
+    private val repositoryScope by lazy {
         CoroutineScope(SupervisorJob() + Dispatchers.IO + coroutineExceptionHandler)
+    }
 
-    private val _loadingStatus = MutableStateFlow<Result>(Result.Loading("Loading"))
+    private val _loadingStatus by lazy { MutableStateFlow<Response>(Response.Loading("Loading")) }
 
 
-    override fun getLoadingStatus(): StateFlow<Result> = _loadingStatus
+    override fun getLoadingStatus(): StateFlow<Response> = _loadingStatus
 
     override fun getWatchStock(): Flow<List<StockMainEntity>> =
         stockDao.readWatchMain()
@@ -57,7 +58,7 @@ class Repository @Inject constructor(
     override fun refreshStock() {
         repositoryScope.launch {
             var count = 0L
-            _loadingStatus.value = Result.Loading("Start refreshing ")
+            _loadingStatus.value = Response.Loading("Start refreshing ")
             stockDao.readAllStock().forEach { stock ->
                 val response = networkApi.getQuote(stock.symbol)
                 val newStock =
@@ -71,27 +72,27 @@ class Repository @Inject constructor(
                 stockDao.insert(newStock)
                 count++
             }
-            _loadingStatus.value = Result.Success("Refreshed $count fields updated")
+            _loadingStatus.value = Response.Success("Refreshed $count fields updated")
         }
     }
 
     override fun deleteStock(stockId: Long) {
         repositoryScope.launch {
             val itemDeleted = stockDao.deleteStockById(stockId)
-            _loadingStatus.value = Result.Success("$itemDeleted item successfully deleted")
+            _loadingStatus.value = Response.Success("$itemDeleted item successfully deleted")
         }
     }
 
     override fun clearStockTable() {
         repositoryScope.launch {
             val itemDeleted = stockDao.clearStockMain()
-            _loadingStatus.value = Result.Success("$itemDeleted item successfully deleted")
+            _loadingStatus.value = Response.Success("$itemDeleted item successfully deleted")
         }
     }
 
 
     override fun addNewStock(searchItem: SearchItem, isFavorite: Boolean): LongArray {
-        _loadingStatus.value = Result.Loading("Start Searching")
+        _loadingStatus.value = Response.Loading("Start Searching")
         Log.d(TAG, "addNewStock: $searchItem")
         var quantity: LongArray = longArrayOf(-1)
         repositoryScope.launch {
@@ -100,12 +101,12 @@ class Repository @Inject constructor(
                 val stockMainEntity = StockMainEntity(it, searchItem, isFavorite)
                 quantity = stockDao.insert(stockMainEntity)
             }
-            _loadingStatus.value = Result.Success("New Stock added")
+            _loadingStatus.value = Response.Success("New Stock added")
         }
         return quantity
     }
 
-    private val _listSearchItems = MutableStateFlow(listOf<SearchItem>())
+    private val _listSearchItems by lazy { MutableStateFlow(listOf<SearchItem>()) }
 
     override fun getResultsList(): StateFlow<List<SearchItem>> =
         _listSearchItems
@@ -115,7 +116,7 @@ class Repository @Inject constructor(
     }
 
     override fun search(query: String) {
-        _loadingStatus.value = Result.Loading("Start Searching")
+        _loadingStatus.value = Response.Loading("Start Searching")
         repositoryScope.launch {
             val searchResult = networkApi.search(query)
             val searchItems = searchResult.resultSearch
@@ -125,7 +126,7 @@ class Repository @Inject constructor(
                 }
             searchItems?.let { items ->
                 _listSearchItems.value = items
-                _loadingStatus.value = Result.Success("New Stock added")
+                _loadingStatus.value = Response.Success("New Stock added")
                 addSearchedWord(query)
             }
         }
@@ -146,31 +147,31 @@ class Repository @Inject constructor(
     override fun lastSearchedWords(): Flow<List<SearchedWordEntity>> =
         stockDao.readSearchedWords()
 
-    private val _candles = MutableStateFlow(StockCandles())
+    private val _candles by lazy { MutableStateFlow(StockCandles()) }
 
     override fun getCandles(): StateFlow<StockCandles> = _candles
 
 
-    override fun requeryCandles(
+    override suspend fun requeryCandles(
         symbol: String,
         timeFrame: TimeFrame,
         timePeriod: TimePeriod
     ) {
-        _loadingStatus.value = Result.Loading("Start Loading Candles")
-        repositoryScope.launch {
+        _loadingStatus.value = Response.Loading("Start Loading Candles")
+        try {
             val currentTime: Long = System.currentTimeMillis() / 1000
-            Log.d(TAG, "getCandlesArrays: $currentTime")
-
             val from = currentTime - timePeriod.timestamp
-            Log.d(TAG, "requeryCandles: symbol: ${symbol}, resolution: ${timeFrame.resolution}, from: $from, currentTime: $currentTime}")
-            val candleResponse = networkApi.getSymbolCandles(symbol, timeFrame.resolution, from, currentTime)
-            Log.d(TAG, "getSymbolCandles: ${candleResponse.open_prices} ")
-            Log.d(TAG, "getSymbolCandles: ${_candles.value.open_prices} ")
+            val candleResponse =
+                networkApi.getSymbolCandles(symbol, timeFrame.resolution, from, currentTime)
             _loadingStatus.value =
-                Result.Loading("Post loading stat ${candleResponse.status_response}")
+                Response.Loading("Post loading stat ${candleResponse.status_response}")
+
             _candles.value = StockCandles(candleResponse)
+
             _loadingStatus.value =
-                Result.Success("New Stock added ${candleResponse.status_response}")
+                Response.Success("New Stock added ${candleResponse.status_response}")
+        } catch (thr: Throwable) {
+            Response.Error("New Stock not added $thr")
         }
     }
 
@@ -179,17 +180,59 @@ class Repository @Inject constructor(
     }
 
 
+    private val _tradeWebSocketResponse by lazy { MutableStateFlow(TradeSocketData()) }
+    override fun getTradeSocketData(): StateFlow<TradeSocketData> = _tradeWebSocketResponse
+
+    private var tradeWebSocket: WebSocket? = null
+
+    override fun startWebSocket() {
+        tradeWebSocket = NetworkApi.tradeWebSocket()
+    }
+
+    override suspend fun sendWebSocket(symbol: String) {
+        val symbolSocketRequest = JSONObject()
+        symbolSocketRequest.put("type", "subscribe")
+        symbolSocketRequest.put("symbol", symbol)
+
+        tradeWebSocket?.send(symbolSocketRequest.toString())
+        NetworkApi.tradeWebSocketListener.tradeStateFlow.collectLatest { result ->
+            if (result.isSuccess) {
+                _tradeWebSocketResponse.value =
+                    result.getOrNull()?.data?.foldToTrade() ?: TradeSocketData()
+                _loadingStatus.value = Response.Success("WebSocket Success")
+            } else {
+                _loadingStatus.value = Response.Error("webSocket  ${result.exceptionOrNull()}")
+            }
+        }
+    }
+
+    private fun List<DataItem?>.foldToTrade(): TradeSocketData {
+        val symbol = get(0)?.symbol ?: ""
+        val price = (filterNotNull()
+            .map { it.price ?: 0.0 }
+            .fold(0.0) { oz, os -> oz + os }) / size
+
+        val time = get(this.lastIndex)?.time ?: 0L
+        return TradeSocketData(symbol = symbol, price = price, time = time)
+    }
+
+
+    override fun stopSocket() {
+        tradeWebSocket?.close(1001, "Fuu")
+    }
+
+
 }
 
 
-sealed class Result {
-    data class Success(val success: String) : Result()
-    data class Loading(val loading: String) : Result()
-    data class Error(val error: String) : Result()
+sealed class Response {
+    data class Success(val success: String) : Response()
+    data class Loading(val loading: String) : Response()
+    data class Error(val error: String) : Response()
 }
 
 interface RepoStatus {
-    fun getLoadingStatus(): StateFlow<Result>
+    fun getLoadingStatus(): StateFlow<Response>
 
 }
 
@@ -212,21 +255,25 @@ interface SearchStockRepo : RepoStatus {
 
 interface TradeStockRepo : RepoStatus {
     fun getCandles(): StateFlow<StockCandles>
-
-    fun requeryCandles(
+    suspend fun requeryCandles(
         symbol: String,
         timeFrame: TimeFrame,
         timePeriod: TimePeriod
     )
     fun clearCandles()
+    fun startWebSocket()
+    suspend fun sendWebSocket(symbol: String)
+    fun getTradeSocketData(): StateFlow<TradeSocketData>
+    fun stopSocket()
 }
 
 
-enum class TimePeriod(val timestamp: Long) {
-    DAY(86400L), MONTH(2592000), YEAR(31536000)
+enum class TimePeriod(val timestamp: Long, @StringRes stringResName: Int) {
+    DAY(86400L, R.string.day), MONTH(2592000, R.string.month), YEAR(31536000, R.string.year)
 }
 
 enum class TimeFrame(val resolution: String) {
-    ONE_M("1"), FIVE_M("5"), FIFTEEN_M("15"), THIRTY_M("30")
-    , HOUR("60"), DAY("D"), WEEK("W"), MONTH("M")
+    ONE_M("1"), FIVE_M("5"), FIFTEEN_M("15"), THIRTY_M("30"), HOUR("60"), DAY("D"), WEEK("W"), MONTH(
+        "M"
+    )
 }

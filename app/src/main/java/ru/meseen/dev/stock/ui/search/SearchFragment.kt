@@ -25,11 +25,9 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import ru.meseen.dev.stock.R
-import ru.meseen.dev.stock.data.Result
+import ru.meseen.dev.stock.data.Response
 import ru.meseen.dev.stock.data.db.entitys.SearchItem
 import ru.meseen.dev.stock.databinding.SearchFragmentBinding
 
@@ -113,7 +111,7 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
     private fun setupRefreshStateListener() {
         lifecycleScope.launchWhenCreated {
             viewModel.statusLoad.collectLatest {
-                vb.searchSwiperefreshLayout.isRefreshing = it is Result.Loading
+                vb.searchSwiperefreshLayout.isRefreshing = it is Response.Loading
             }
         }
     }
@@ -191,7 +189,7 @@ class SearchFragment : Fragment(R.layout.search_fragment), OnSearchItemClick {
     override fun itemClick(item: SearchItem, view: View) {
         val dialog = BottomSheetDialog(view.context)
         val bottomSheet =
-            LayoutInflater.from(view.context).inflate(R.layout.search_bottom_sheet, null)
+            LayoutInflater.from(view.context).inflate(R.layout.search_bottom_sheet,vb.root,false)
         bottomSheet.findViewById<MaterialButton>(R.id.btn_add_to_watchlist).apply {
             val temp = "Add '${item.symbol}' to Watchlist"
             text = temp

@@ -16,6 +16,7 @@
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:itemBackground">@color/colorPrimary</item>
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Choice</item>
 
     </style>
 
@@ -93,7 +94,6 @@
         <item name="rippleColor">@color/colorAccent</item>
         <item name="colorOnSurface">@color/colorAccent</item>
         <item name="android:textColor">@color/trade_chip_font_color</item>
-
     </style>
 
 

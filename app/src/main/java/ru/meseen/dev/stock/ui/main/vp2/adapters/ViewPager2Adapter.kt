@@ -11,7 +11,7 @@ class ViewPager2Adapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> WatchListFragment.getInstance()
-            else -> FavoriteListFragment()
+            else -> FavoriteListFragment.getInstance()
         }
     }
 }
