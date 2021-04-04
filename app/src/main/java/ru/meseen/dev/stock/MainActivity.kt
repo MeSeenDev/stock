@@ -60,8 +60,9 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
         }
         lifecycleScope.launchWhenCreated {
             repoStatus.getLoadingStatus().collectLatest { response ->
+                Log.wtf(TAG, "onCreate: $response")
                 if (response is Response.Error) {
-                    Toast.makeText(applicationContext, response.error, Toast.LENGTH_LONG).show()
+                    Toast.makeText(binding.container.context, response.error, Toast.LENGTH_LONG).show()
                 }
             }
         }
