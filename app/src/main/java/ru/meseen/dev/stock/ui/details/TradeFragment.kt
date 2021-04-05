@@ -3,7 +3,6 @@ package ru.meseen.dev.stock.ui.details
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -19,13 +18,11 @@ import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.meseen.dev.stock.R
-import ru.meseen.dev.stock.data.Response
 import ru.meseen.dev.stock.data.TimeFrame
 import ru.meseen.dev.stock.data.TimePeriod
 import ru.meseen.dev.stock.data.db.entitys.StockCandles
@@ -57,7 +54,6 @@ class TradeFragment : Fragment(R.layout.trade_fragment) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         stokeEntity?.let {
-            Log.d(TAG, "onCreate: startSocket")
             viewModel.startSocket()
             viewModel.sendWebSocket(it.symbol)
         }
@@ -129,9 +125,10 @@ class TradeFragment : Fragment(R.layout.trade_fragment) {
         lifecycleScope.launch {
             viewModel.tradeWebSocket.collectLatest { trade ->
                 if (trade.price != null && stokeEntity?.current_price != null) {
-                    setTextCurPrices(
-                        current_price = stokeEntity!!.current_price!!,
-                        prev_close_price = trade.price
+                    setPriceText(trade.price)
+                    setDiffTextPrices(
+                        current_price = trade.price,
+                        prev_close_price = stokeEntity!!.prev_close_price!!
                     )
                 }
             }
@@ -157,26 +154,31 @@ class TradeFragment : Fragment(R.layout.trade_fragment) {
         vb.tvStockSymbol.text = stoke.symbol
         vb.toolbarTradeTitle.text = stoke.description
         if (stoke.current_price != null && stoke.prev_close_price != null) {
-            setTextCurPrices(stoke.current_price, stoke.prev_close_price)
+            setPriceText(stoke.current_price)
+            setDiffTextPrices(stoke.current_price, stoke.prev_close_price)
         }
     }
 
-    private fun setTextCurPrices(
+    private fun setDiffTextPrices(
         current_price: Double,
         prev_close_price: Double
     ) {
-        val curPrice = "$current_price $"
-        vb.tvDescription.text = curPrice
         val diffPrice = "${
             current_price
                 .subtractPrices(prev_close_price)
-                .round(2).absoluteValue
+                .round(2)
+                .absoluteValue
         } %"
         vb.tvDiffStock.text = diffPrice
         val colorDiff = requireContext()
             .getStockTextColor(prev_close_price > current_price)
         vb.tvDiffStock.setTextColor(colorDiff)
         setupArrowDiffPrice(colorDiff, prev_close_price, current_price)
+    }
+
+    private fun setPriceText(current_price: Double) {
+        val curPrice = "${current_price.round(2)} $"
+        vb.tvDescription.text = curPrice
     }
 
     private fun setupArrowDiffPrice(
